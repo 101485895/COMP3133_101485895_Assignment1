@@ -27,7 +27,7 @@ const typeDefs = `
   }
 
   type Query {
-    hello: String
+    login(username: String, email: String, password: String!): SignupResponse!
   }
 
   type Mutation {
@@ -37,7 +37,26 @@ const typeDefs = `
 
 const resolvers = {
   Query: {
-    hello: () => "GraphQL is working!",
+    login: async (_, { username, email, password }) => {
+      if ((!username && !email) || !password) {
+        return { success: false, message: "Username/email and password required", user: null };
+      }
+
+      const user = await User.findOne({
+        $or: [{ username }, { email }],
+      });
+
+      if (!user) {
+        return { success: false, message: "User not found", user: null };
+      }
+
+      const ok = await bcrypt.compare(password, user.password);
+      if (!ok) {
+        return { success: false, message: "Invalid password", user: null };
+      }
+
+      return { success: true, message: "Login successful", user };
+},
   },
   Mutation: {
     signup: async (_, { username, email, password }) => {
