@@ -73,6 +73,19 @@ const typeDefs = `
       department: String!
       employee_photo: String
     ): EmployeeResponse!
+
+    updateEmployeeById(
+      eid: ID!
+      first_name: String
+      last_name: String
+      email: String
+      gender: String
+      designation: String
+      salary: Float
+      date_of_joining: String
+      department: String
+      employee_photo: String
+    ): EmployeeResponse!
   }
 `;
 
@@ -129,6 +142,7 @@ const resolvers = {
 
       return { success: true, message: "User created successfully", user };
     },
+
     addNewEmployee: async (_, args) => {
       if (args.salary < 1000) {
         return {
@@ -143,6 +157,36 @@ const resolvers = {
       return {
         success: true,
         message: "Employee added successfully",
+        employee
+      };
+    },
+
+    updateEmployeeById: async (_, { eid, ...updates }) => {
+      if (updates.salary && updates.salary < 1000) {
+        return {
+          success: false,
+          message: "Salary must be at least 1000",
+          employee: null
+        };
+      }
+
+      const employee = await Employee.findByIdAndUpdate(
+        eid,
+        updates,
+        { new: true }
+      );
+
+      if (!employee) {
+        return {
+          success: false,
+          message: "Employee not found",
+          employee: null
+        };
+      }
+
+      return {
+        success: true,
+        message: "Employee updated successfully",
         employee
       };
     },
