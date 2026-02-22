@@ -10,6 +10,9 @@ const bcrypt = require("bcryptjs");
 const User = require("./models/User");
 const Employee = require("./models/Employee");
 
+const multer = require("multer");
+const cloudinary = require("./config/cloudinary");
+
 const app = express();
 app.use(express.json());
 
@@ -241,6 +244,27 @@ const resolvers = {
     },
   },
 };
+
+const upload = multer({ storage: multer.memoryStorage() });
+
+app.post("/upload", upload.single("image"), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+
+    const result = await cloudinary.uploader.upload(
+      `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
+      { folder: "comp3133_employees" }
+    );
+
+    return res.json({
+      success: true,
+      url: result.secure_url,
+      public_id: result.public_id,
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
 
 async function startServer() {
   const server = new ApolloServer({ typeDefs, resolvers });
