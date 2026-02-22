@@ -19,8 +19,11 @@
   },
   "homepage": "https://github.com/101485895/COMP3133_101485895_Assignment1#readme",
   "dependencies": {
+    "@apollo/server": "^5.4.0",
+    "@as-integrations/express5": "^1.1.2",
     "dotenv": "^17.2.4",
     "express": "^5.2.1",
+    "graphql": "^16.12.0",
     "mongoose": "^9.1.6"
   },
   "devDependencies": {
