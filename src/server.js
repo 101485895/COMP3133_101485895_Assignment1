@@ -6,7 +6,9 @@ const { expressMiddleware } = require("@as-integrations/express5");
 
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+
 const User = require("./models/User");
+const Employee = require("./models/Employee");
 
 const app = express();
 app.use(express.json());
@@ -20,6 +22,27 @@ const typeDefs = `
     updated_at: String
   }
 
+  type Employee {
+    _id: ID!
+    first_name: String!
+    last_name: String!
+    email: String
+    gender: String
+    designation: String!
+    salary: Float!
+    date_of_joining: String!
+    department: String!
+    employee_photo: String
+    created_at: String
+    updated_at: String
+  }
+
+  type EmployeeResponse {
+    success: Boolean!
+    message: String!
+    employee: Employee
+  }
+
   type SignupResponse {
     success: Boolean!
     message: String!
@@ -31,7 +54,23 @@ const typeDefs = `
   }
 
   type Mutation {
-    signup(username: String!, email: String!, password: String!): SignupResponse!
+    signup(
+      username: String!, 
+      email: String!, 
+      password: String!
+    ): SignupResponse!
+
+    addNewEmployee(
+      first_name: String!
+      last_name: String!
+      email: String
+      gender: String
+      designation: String!
+      salary: Float!
+      date_of_joining: String!
+      department: String!
+      employee_photo: String
+    ): EmployeeResponse!
   }
 `;
 
@@ -56,7 +95,7 @@ const resolvers = {
       }
 
       return { success: true, message: "Login successful", user };
-},
+    },
   },
   Mutation: {
     signup: async (_, { username, email, password }) => {
@@ -81,6 +120,23 @@ const resolvers = {
       });
 
       return { success: true, message: "User created successfully", user };
+    },
+    addNewEmployee: async (_, args) => {
+      if (args.salary < 1000) {
+        return {
+          success: false,
+          message: "Salary must be at least 1000",
+          employee: null
+        };
+      }
+
+      const employee = await Employee.create(args);
+
+      return {
+        success: true,
+        message: "Employee added successfully",
+        employee
+      };
     },
   },
 };
