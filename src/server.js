@@ -53,6 +53,7 @@ const typeDefs = `
     login(username: String, email: String, password: String!): SignupResponse!
     getAllEmployees: [Employee]!
     getEmployeeById(eid: ID!): Employee
+    searchEmployees(designation: String, department: String): [Employee]!
   }
 
   type Mutation {
@@ -121,6 +122,15 @@ const resolvers = {
     getEmployeeById: async (_, { eid }) => {
       if (!mongoose.Types.ObjectId.isValid(eid)) return null;
       return await Employee.findById(eid);
+    },
+    searchEmployees: async (_, { designation, department }) => {
+      if (!designation && !department) return [];
+
+      const filter = {};
+      if (designation) filter.designation = designation;
+      if (department) filter.department = department;
+
+      return await Employee.find(filter);
     },
   },
   Mutation: {
