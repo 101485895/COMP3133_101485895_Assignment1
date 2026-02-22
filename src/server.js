@@ -51,6 +51,7 @@ const typeDefs = `
 
   type Query {
     login(username: String, email: String, password: String!): SignupResponse!
+    getAllEmployees: [Employee]!
   }
 
   type Mutation {
@@ -95,6 +96,9 @@ const resolvers = {
       }
 
       return { success: true, message: "Login successful", user };
+    },
+    getAllEmployees: async () => {
+      return await Employee.find();
     },
   },
   Mutation: {
