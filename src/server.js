@@ -86,6 +86,10 @@ const typeDefs = `
       department: String
       employee_photo: String
     ): EmployeeResponse!
+
+    deleteEmployeeById(
+      eid: ID!
+    ): EmployeeResponse!
   }
 `;
 
@@ -115,6 +119,7 @@ const resolvers = {
       return await Employee.find();
     },
     getEmployeeById: async (_, { eid }) => {
+      if (!mongoose.Types.ObjectId.isValid(eid)) return null;
       return await Employee.findById(eid);
     },
   },
@@ -170,6 +175,14 @@ const resolvers = {
         };
       }
 
+      if (!mongoose.Types.ObjectId.isValid(eid)) {
+        return {
+          success: false,
+          message: "Invalid employee id",
+          employee: null
+        };
+      }
+
       const employee = await Employee.findByIdAndUpdate(
         eid,
         updates,
@@ -187,6 +200,32 @@ const resolvers = {
       return {
         success: true,
         message: "Employee updated successfully",
+        employee
+      };
+    },
+
+    deleteEmployeeById: async (_, { eid }) => {
+      if (!mongoose.Types.ObjectId.isValid(eid)) {
+        return {
+          success: false,
+          message: "Invalid employee id",
+          employee: null
+        };
+      }
+
+      const employee = await Employee.findByIdAndDelete(eid);
+
+      if (!employee) {
+        return {
+          success: false,
+          message: "Employee not found",
+          employee: null
+        };
+      }
+
+      return {
+        success: true,
+        message: "Employee deleted successfully",
         employee
       };
     },
