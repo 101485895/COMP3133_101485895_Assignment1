@@ -142,11 +142,24 @@ const resolvers = {
       return await Employee.findById(eid);
     },
     searchEmployees: async (_, { designation, department }) => {
-      if (!designation && !department) return [];
-
       const filter = {};
-      if (designation) filter.designation = designation;
-      if (department) filter.department = department;
+
+      const trimmedDesignation = designation?.trim();
+      const trimmedDepartment = department?.trim();
+
+      if (trimmedDesignation) {
+        filter.designation = {
+          $regex: trimmedDesignation,
+          $options: 'i'
+        };
+      }
+
+      if (trimmedDepartment) {
+        filter.department = {
+          $regex: trimmedDepartment,
+          $options: 'i'
+        };
+      }
 
       return await Employee.find(filter);
     },
