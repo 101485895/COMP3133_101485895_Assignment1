@@ -18,7 +18,7 @@ const cors = require('cors');
 const app = express();
 
 app.use(cors({
-  origin: ['http://localhost:4200', 'https://101485895-comp3133-assignment2.vercel.app/login'],
+  origin: ['http://localhost:4200', 'https://101485895-comp3133-assignment2.vercel.app'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
