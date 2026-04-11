@@ -113,8 +113,14 @@ const resolvers = {
         return { success: false, message: "Username/email and password required", user: null };
       }
 
+      const normalizedUsername = username ? username.trim().toLowerCase() : null;
+      const normalizedEmail = email ? email.trim().toLowerCase() : null;
+
       const user = await User.findOne({
-        $or: [{ username }, { email }],
+        $or: [
+          ...(normalizedUsername ? [{ username: normalizedUsername }] : []),
+          ...(normalizedEmail ? [{ email: normalizedEmail }] : [])
+        ],
       });
 
       if (!user) {
@@ -151,8 +157,14 @@ const resolvers = {
         return { success: false, message: "All fields are required", user: null };
       }
 
+      const normalizedUsername = username.trim().toLowerCase();
+      const normalizedEmail = email.trim().toLowerCase();
+
       const existing = await User.findOne({
-        $or: [{ username }, { email }],
+        $or: [
+          { username: normalizedUsername },
+          { email: normalizedEmail }
+        ],
       });
 
       if (existing) {
@@ -162,8 +174,8 @@ const resolvers = {
       const hashed = await bcrypt.hash(password, 10);
 
       const user = await User.create({
-        username,
-        email,
+        username: normalizedUsername,
+        email: normalizedEmail,
         password: hashed,
       });
 
