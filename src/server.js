@@ -13,7 +13,18 @@ const Employee = require("./models/Employee");
 const multer = require("multer");
 const cloudinary = require("./config/cloudinary");
 
+const cors = require('cors');
+
 const app = express();
+
+app.use(cors({
+  origin: ['http://localhost:4200'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+app.options('*', cors());
+
 app.use(express.json());
 
 const typeDefs = `
